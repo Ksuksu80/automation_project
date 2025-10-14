@@ -1,17 +1,36 @@
-# Python
+# --- Python ---
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
+*.pdb
+*.egg
+*.egg-info/
+*.eggs/
+*.manifest
+*.spec
 
-# Virtual environments
+# --- Virtual environments ---
 venv/
 .env/
 .venv/
 
-# IDE
+# --- PyCharm / JetBrains ---
 .idea/
-.vscode/
+*.iml
 
-# macOS
+# --- Unit test / coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# --- Logs ---
+*.log
+
+# --- OS-specific files ---
 .DS_Store
+Thumbs.db
+
+# --- Reports or temp folders ---
+reports/
