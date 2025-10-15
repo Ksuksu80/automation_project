@@ -39,5 +39,18 @@ pipeline{
                 archiveArtifacts artifacts: 'reports/**', fingerprint: true
             }
         }
+            // creates report under the build
+            stage('Publish HTML Report') {
+                steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'reports',
+                    reportFiles: 'report.html',
+                    reportName: 'Pytest HTML Report'
+                ])
+            }
+        }
     }
 }
