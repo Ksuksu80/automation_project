@@ -3,7 +3,7 @@ pipeline{
 
     triggers{
     // auto tests starts every day at 3 am
-    cron('H3***')
+    cron('H 3 * * *')
     }
 
     stages{
@@ -12,11 +12,11 @@ pipeline{
                 checkout scm
                 }
             }
-        stage('Install depensancies'){
+        stage('Install dependencies'){
             steps{
                 sh'''
                     python3 -m venv venv
-                    .venv/bin/activate
+                    . venv/bin/activate
                     python -m pip install --upgrade pip
                     pip install -r requirements.txt
                 '''
