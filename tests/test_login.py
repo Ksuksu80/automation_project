@@ -2,7 +2,7 @@ from pages.login_page import LoginPageLocators as Loc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
-from faker import Faker
+from utils.helper_methods import close_banner_if_present
 import time
 from faker import Faker
 
@@ -27,7 +27,10 @@ def test_1_register_user(browser):
 
     WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, "//h2[contains(., 'Enter Account Information')]")))
     print("✅ Account info form is visible")
-    # 3. type the application in
+
+    # 3. close banner if it exists
+    close_banner_if_present(browser)
+    # 4. type the application in
     browser.find_element(By.ID, "id_gender1").click()
     browser.find_element(By.ID, "password").send_keys("Qwerty123!")
     time.sleep(3)
