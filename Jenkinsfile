@@ -19,6 +19,7 @@ pipeline{
                     . venv/bin/activate
                     python -m pip install --upgrade pip
                     pip install -r requirements.txt
+                    pip install allure-pytest
                 '''
             }
         }
@@ -28,7 +29,12 @@ pipeline{
                 sh '''
                     . venv/bin/activate
                     mkdir -p reports
-                    pytest -q --junitxml=reports/junit.xml --html=reports/report.html --self-contained-html
+                    mkdir -p allure-results
+                    pytest -q \
+                        --junitxml=reports/junit.xml \
+                        --html=reports/report.html \
+                        --self-contained-html \
+                        --alluredir=allure-results
                 '''
             }
         }
@@ -51,6 +57,17 @@ pipeline{
                     reportName: 'Pytest HTML Report'
                 ])
             }
+        }
+        stage('Allure Report') {
+            steps {
+                allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Build finished!'
         }
     }
 }
