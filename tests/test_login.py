@@ -2,7 +2,8 @@ from pages.login_page import LoginPageLocators as Loc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
-from utils.helper_methods import close_banner_if_present
+from utils.helper_methods import close_banner_if_present, remove_iframe_ads
+from selenium.common.exceptions import ElementClickInterceptedException
 import time
 from faker import Faker
 
@@ -28,22 +29,41 @@ def test_1_register_user(browser):
     WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, "//h2[contains(., 'Enter Account Information')]")))
     print("✅ Account info form is visible")
 
-    # 3. close banner if it exists
-    close_banner_if_present(browser)
-    # 4. type the application in
-    browser.find_element(By.ID, "id_gender1").click()
+    # 3. type the application in
+
     browser.find_element(By.ID, "password").send_keys("Qwerty123!")
     time.sleep(3)
 
     Select(browser.find_element(By.ID, "days")).select_by_visible_text("10")
     Select(browser.find_element(By.ID, "months")).select_by_visible_text("May")
     Select(browser.find_element(By.ID, "years")).select_by_visible_text("1995")
+    # 4. close banner if it exists
+    time.sleep(3)
+    close_banner_if_present(browser)
+    remove_iframe_ads(browser)
+    try:
+         checkbox_newsletter = browser.find_element(By.XPATH, "//input[@id='newsletter']")
+         checkbox_newsletter.click()
+    except ElementClickInterceptedException:
+         print("Click intercepted on newsletter checkbox — retry with JS")
+         remove_iframe_ads(browser)
+         browser.execute_script("arguments[0].click();", checkbox_newsletter)
 
     # mark checkboxes
-    checkbox = browser.find_element(By.XPATH, "//input[@id='newsletter']")
-    checkbox.click()
-    checkbox = browser.find_element(By.XPATH, "//input[@id='optin']")
-    checkbox.click()
+    # checkbox = browser.find_element(By.XPATH, "//input[@id='newsletter']")
+    # checkbox.click()
+    # checkbox_optin = browser.find_element(By.XPATH, "//input[@id='optin']")
+    # checkbox_optin.click()
+    close_banner_if_present(browser)
+    remove_iframe_ads(browser)
+    time.sleep(3)
+    try:
+        checkbox_optin = browser.find_element(By.XPATH, "//input[@id='optin']")
+        checkbox_optin.click()
+    except ElementClickInterceptedException:
+        print("Click intercepted on optin checkbox — retry with JS")
+        remove_iframe_ads(browser)
+        browser.execute_script("arguments[0].click();", checkbox_optin)
     time.sleep(3)
 
     browser.find_element(By.ID, "first_name").send_keys(name)
@@ -56,8 +76,18 @@ def test_1_register_user(browser):
     browser.find_element(By.ID, "city").send_keys("San Diego")
     browser.find_element(By.ID, "zipcode").send_keys("92101")
     browser.find_element(By.ID, "mobile_number").send_keys("3473561000")
-    browser.find_element(By.XPATH, "//button[@data-qa='create-account']").click()
-
+    # remove_iframe_ads(browser)
+    # time.sleep(3)
+    # browser.find_element(By.XPATH, "//button[@data-qa='create-account']").click()
+    create_button = browser.find_element(By.XPATH, "//button[@data-qa='create-account']")
+    try:
+        create_button.click()
+    except ElementClickInterceptedException:
+        print("⚠️ Click intercepted on create-account — retrying after cleaning ads")
+        remove_iframe_ads(browser)
+        browser.execute_script("arguments[0].scrollIntoView(true);", create_button)
+        time.sleep(1)
+        browser.execute_script("arguments[0].click();", create_button)
     WebDriverWait(browser, 10).until(
         EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "ACCOUNT CREATED!"))
 
